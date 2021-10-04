@@ -1,0 +1,10 @@
+[Unit]
+Description=Bors Metrics fetcher
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/env ./run_server.sh
+WorkingDirectory=%h
+
+[Install]
+WantedBy=default.target
