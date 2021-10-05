@@ -5,6 +5,7 @@ setup: venv
 
 deploy: setup
 	rsync -avz --delete-after fetch_bors_metrics.py run_server.sh venv ${HOST}:
+	rsync -avz htdocs/index.html ${HOST}:htdocs/
 
 ssh:
 	ssh ${HOST}
