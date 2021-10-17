@@ -21,6 +21,7 @@ registry = CollectorRegistry()
 # Create a metric to track time spent and requests made.
 REQUEST_TIME = Summary('request_processing_seconds', 'Time spent processing request', registry=registry, namespace=NAMESPACE)
 FETCH_TIME = Summary('fetch_processing_seconds', 'Time spent processing request', registry=registry, namespace=NAMESPACE)
+PARSE_TIME = Summary('parse_processing_seconds', 'Time spent processing request', registry=registry, namespace=NAMESPACE)
 
 ### Fetching the interesting data
 @FETCH_TIME.time()
@@ -29,8 +30,10 @@ def fetch(url):
     if r.status_code != 200:
         print("failed to fetch", url, r.status_code)
         return ""
-    
-    soup = BeautifulSoup(r.text, features="html.parser")
+    return r.text
+
+def parse_html_find_head(text):
+    soup = BeautifulSoup(text, features="html.parser")
     p = soup.body.findNext('p')
     p = p.findNextSibling('p')
     
@@ -39,12 +42,14 @@ def fetch(url):
     
     return first
 
+@PARSE_TIME.time()
 def parse_totals_string(queue_name, input):
+    head = parse_html_find_head(input)
     """
     Expecting something like this:
     '449 total, 59 approved, 12 rolled up, 9 failed\n            /'
     """
-    l = input.splitlines()[0]
+    l = head.splitlines()[0]
     parts = l.split(',')
     
     o = {}

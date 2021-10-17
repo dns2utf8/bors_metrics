@@ -1,5 +1,11 @@
 HOST = "web_bors-metrics.estada.ch@lich.estada.ch"
 
+run: venv
+	./venv/bin/python3 ./fetch_bors_metrics.py
+
+fetch_live:
+	curl https://bors-metrics.estada.ch/metrics
+
 setup: venv
 	. venv/bin/activate && pip install prometheus-client beautifulsoup4 requests
 
